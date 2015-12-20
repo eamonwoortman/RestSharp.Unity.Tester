@@ -15,7 +15,6 @@ public class RestSharpTester : MonoBehaviour {
 
     private void StartTests() {
         foreach(string testUrl in testUrls) {
-
             DoRequest(testUrl);
         }
     }
@@ -27,18 +26,19 @@ public class RestSharpTester : MonoBehaviour {
 
         Debug.Log("Testing url: " + requestUrl);
         IRestResponse response = client.Get(request);
-        ValidateResponse(response, false);
-
+        ValidateResponse(requestUrl, response, false);
+        
         client.GetAsync(request, OnResponse);
+        
     }
 
     private void OnResponse(IRestResponse response, RestRequestAsyncHandle handle) {
-        ValidateResponse(response, true);
+        string requestUrl = response.ResponseUri != null ? response.ResponseUri.ToString() : "Could not get response URI";
+        ValidateResponse(requestUrl, response, true);
     }
 
-    private bool ValidateResponse(IRestResponse response, bool isAsyncRequest) {
+    private bool ValidateResponse(string requestUrl, IRestResponse response, bool isAsyncRequest) {
         string requestType = (isAsyncRequest ? "async" : "sync");
-        string requestUrl = response.ResponseUri.ToString();
         if (response.ErrorException != null) {
             Debug.LogError("Request("+ requestType + ") failed for url: " + requestUrl);
             return false;
