@@ -6,8 +6,11 @@ using System;
 using RestSharp.Deserializers;
 
 public class RestSharpTester : MonoBehaviour {
+
     private readonly string[] testUrls = { "http://httpbin.org/gzip", "http://httpbin.org/deflate", "https://httpbin.org/gzip", "https://httpbin.org/deflate" };
     private JsonDeserializer deserializer = new JsonDeserializer();
+    private string output = "";
+    private Vector2 scrollPosition = Vector2.zero;
 
     private void Start () {
         Invoke("StartTests", 1f);
@@ -53,6 +56,25 @@ public class RestSharpTester : MonoBehaviour {
         Debug.Log("Successfully executed " + requestType + " request for url: " + requestUrl);
         return true;
     }
+    
+    private void OnEnable() {
+        Application.logMessageReceivedThreaded += HandleLog;
+    }
+
+    private void OnDisable() {
+        Application.logMessageReceivedThreaded -= HandleLog;
+    }
+
+    private void HandleLog(string logString, string stackTrace, LogType type) {
+        output += logString + "\n";
+    }
+
+    private void OnGUI() {
+        scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width - 10), GUILayout.Height(Screen.height - 10));
+        GUILayout.Label(output);
+        GUILayout.EndScrollView();
+    }
+
 }
 
 
